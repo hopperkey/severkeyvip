@@ -1,0 +1,2225 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - KeyAuth Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --secondary: #3a0ca3;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --info: #7209b7;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f7fb;
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: white;
+            box-shadow: var(--box-shadow);
+            z-index: 1000;
+            transition: var(--transition);
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sidebar-header i {
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            color: var(--dark);
+            text-decoration: none;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: rgba(67, 97, 238, 0.05);
+            border-left-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .menu-item.active {
+            background: rgba(67, 97, 238, 0.1);
+            border-left-color: var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .menu-item i {
+            width: 24px;
+            margin-right: 12px;
+            font-size: 18px;
+        }
+
+        .menu-item span {
+            font-size: 14px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            padding: 20px;
+            min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        /* Topbar */
+        .topbar {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 15px 25px;
+            margin-bottom: 25px;
+            box-shadow: var(--box-shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideDown 0.5s ease;
+        }
+
+        .topbar-left h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 15px;
+            background: var(--gray-light);
+            border-radius: 50px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .btn-logout {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-logout:hover {
+            background: #d1145a;
+            transform: translateY(-2px);
+        }
+
+        /* Stats Cards */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            font-size: 22px;
+            color: white;
+        }
+
+        .stat-card:nth-child(1) .stat-icon { background: var(--primary); }
+        .stat-card:nth-child(2) .stat-icon { background: var(--success); }
+        .stat-card:nth-child(3) .stat-icon { background: var(--warning); }
+        .stat-card:nth-child(4) .stat-icon { background: var(--danger); }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            margin-top: 10px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: 600;
+        }
+
+        .positive { background: rgba(76, 201, 240, 0.15); color: #0369a1; }
+        .negative { background: rgba(247, 37, 133, 0.15); color: var(--danger); }
+
+        /* Content Sections */
+        .content-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: var(--box-shadow);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .section-header h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary), var(--primary-light));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.2);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--gray-light);
+            color: var(--dark);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Tables */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--gray-light);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .data-table th {
+            background: var(--gray-light);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 2px solid var(--gray-light);
+        }
+
+        .data-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--gray-light);
+            vertical-align: middle;
+        }
+
+        .data-table tr:hover {
+            background: rgba(67, 97, 238, 0.03);
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-active { background: rgba(76, 201, 240, 0.15); color: #0369a1; }
+        .status-inactive { background: rgba(108, 117, 125, 0.15); color: var(--gray); }
+        .status-banned { background: rgba(247, 37, 133, 0.15); color: var(--danger); }
+        .status-expired { background: rgba(248, 150, 30, 0.15); color: var(--warning); }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--gray-light);
+            color: var(--dark);
+            border: none;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .action-btn.view:hover { background: var(--primary); color: white; }
+        .action-btn.edit:hover { background: var(--success); color: white; }
+        .action-btn.delete:hover { background: var(--danger); color: white; }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.4s ease;
+        }
+
+        .modal-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--gray);
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--danger);
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Loader */
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: var(--gray-light);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .menu-toggle {
+                display: block !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Menu Toggle (Mobile) */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--dark);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-key"></i>
+            <h2>KeyAuth Admin</h2>
+        </div>
+        
+        <div class="sidebar-menu">
+            <a href="#dashboard" class="menu-item active" data-section="dashboard">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#applications" class="menu-item" data-section="applications">
+                <i class="fas fa-box"></i>
+                <span>Applications</span>
+            </a>
+            <a href="#keys" class="menu-item" data-section="keys">
+                <i class="fas fa-key"></i>
+                <span>Keys</span>
+            </a>
+            <a href="#users" class="menu-item" data-section="users">
+                <i class="fas fa-users"></i>
+                <span>Users</span>
+            </a>
+            <a href="#support" class="menu-item" data-section="support">
+                <i class="fas fa-headset"></i>
+                <span>Support</span>
+            </a>
+            <a href="#analytics" class="menu-item" data-section="analytics">
+                <i class="fas fa-chart-line"></i>
+                <span>Analytics</span>
+            </a>
+            <a href="#settings" class="menu-item" data-section="settings">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Topbar -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 id="pageTitle">Dashboard</h1>
+            </div>
+            
+            <div class="topbar-right">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">
+    <i class="fas fa-user"></i>
+</div>
+                    <div>
+                        <div id="userName">Administrator</div>
+                        <div style="font-size: 12px; color: var(--gray);">Admin</div>
+                    </div>
+                </div>
+                <button class="btn-logout" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboardSection" class="content-section">
+            <!-- Stats Cards -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="stat-value" id="totalApps">0</div>
+                    <div class="stat-label">Total Applications</div>
+                    <div class="stat-change positive" id="appChange">+0 Today</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <div class="stat-value" id="totalKeys">0</div>
+                    <div class="stat-label">Total Keys</div>
+                    <div class="stat-change positive" id="keyChange">+0 Today</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-value" id="totalUsers">0</div>
+                    <div class="stat-label">Total Users</div>
+                    <div class="stat-change positive" id="userChange">+0 Today</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-value" id="activeKeys">0</div>
+                    <div class="stat-label">Active Keys</div>
+                    <div class="stat-change positive">98% Active</div>
+                </div>
+            </div>
+
+            <!-- Recent Applications -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-clock"></i> Recent Applications</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-primary" onclick="showCreateAppModal()">
+                            <i class="fas fa-plus"></i> New App
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="data-table" id="recentAppsTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>API Key</th>
+                                <th>Owner</th>
+                                <th>Created</th>
+                                <th>Keys</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentAppsBody">
+                            <!-- Apps will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recent Keys -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-key"></i> Recent Keys</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-primary" onclick="showCreateKeyModal()">
+                            <i class="fas fa-plus"></i> New Key
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="data-table" id="recentKeysTable">
+                        <thead>
+                            <tr>
+                                <th>Key</th>
+                                <th>Application</th>
+                                <th>Expires</th>
+                                <th>Status</th>
+                                <th>HWID</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentKeysBody">
+                            <!-- Keys will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Applications Section (Hidden by default) -->
+        <div id="applicationsSection" class="content-section" style="display: none;">
+            <div class="section-header">
+                <h2><i class="fas fa-box"></i> Applications Management</h2>
+                <div class="section-actions">
+                    <button class="btn btn-outline" onclick="refreshApplications()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                    <button class="btn btn-primary" onclick="showCreateAppModal()">
+                        <i class="fas fa-plus"></i> New Application
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="data-table" id="appsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>API Key</th>
+                            <th>Owner</th>
+                            <th>Created</th>
+                            <th>Keys</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="appsTableBody">
+                        <!-- Apps will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Keys Section (Hidden by default) -->
+<div id="keysSection" class="content-section" style="display: none;">
+    <div class="section-header">
+        <h2><i class="fas fa-key"></i> Keys Management</h2>
+        <div class="section-actions" style="display: flex; gap: 10px; align-items: center;">
+            <div class="search-wrapper" style="position: relative;">
+                <i class="fas fa-search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #aaa;"></i>
+                <input type="text" id="keySearchInput" class="form-control" placeholder="Tìm Key hoặc HWID..." 
+                       style="padding-left: 30px; width: 220px;" onkeyup="filterKeysTable()">
+            </div>
+
+            <select class="form-control" id="appFilter" style="width: 200px;" onchange="loadKeys()">
+                <option value="">All Applications</option>
+            </select>
+            <button class="btn btn-outline" onclick="refreshKeys()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+            <button class="btn btn-primary" onclick="showCreateKeyModal()">
+                <i class="fas fa-plus"></i> New Key
+            </button>
+        </div>
+    </div>
+   
+            
+            <div class="table-responsive">
+                <table class="data-table" id="keysTable">
+                    <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Application</th>
+                            <th>Prefix</th>
+                            <th>Created</th>
+                            <th>Expires</th>
+                            <th>Status</th>
+                            <th>HWID</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="keysTableBody">
+                        <!-- Keys will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Users Section (Hidden by default) -->
+        <div id="usersSection" class="content-section" style="display: none;">
+            <div class="section-header">
+                <h2><i class="fas fa-users"></i> Users Management</h2>
+                <div class="section-actions">
+                    <input type="text" class="form-control" id="userSearch" placeholder="Search users..." style="width: 200px;">
+                    <button class="btn btn-outline" onclick="refreshUsers()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="data-table" id="usersTable">
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Apps Count</th>
+                            <th>Keys Count</th>
+                            <th>Last Active</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <!-- Users will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Support Section (Hidden by default) -->
+        <div id="supportSection" class="content-section" style="display: none;">
+            <div class="section-header">
+                <h2><i class="fas fa-headset"></i> Support Management</h2>
+                <div class="section-actions">
+                    <button class="btn btn-outline" onclick="refreshSupports()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                    <button class="btn btn-primary" onclick="showAddSupportModal()">
+                        <i class="fas fa-user-plus"></i> Add Support
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="data-table" id="supportsTable">
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Added By</th>
+                            <th>Added Date</th>
+                            <th>App Count</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="supportsTableBody">
+                        <!-- Supports will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Analytics Section (Hidden by default) -->
+        <div id="analyticsSection" class="content-section" style="display: none;">
+            <div class="section-header">
+                <h2><i class="fas fa-chart-line"></i> Analytics Dashboard</h2>
+                <div class="section-actions">
+                    <select class="form-control" id="timeRange" style="width: 150px;">
+                        <option value="7">Last 7 days</option>
+                        <option value="30">Last 30 days</option>
+                        <option value="90">Last 90 days</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="stat-value" id="growthRate">0%</div>
+                    <div class="stat-label">Growth Rate</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="stat-value" id="revenue">$0</div>
+                    <div class="stat-label">Revenue</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="stat-value" id="activeUsers">0</div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-value" id="satisfaction">0%</div>
+                    <div class="stat-label">Satisfaction</div>
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 30px;">
+                <div class="content-section">
+                    <h3 style="margin-bottom: 20px;">Key Creation Trends</h3>
+                    <div id="keyChart" style="height: 300px; display: flex; align-items: center; justify-content: center; color: var(--gray);">
+                        Chart will be displayed here
+                    </div>
+                </div>
+                
+                <div class="content-section">
+                    <h3 style="margin-bottom: 20px;">Status Distribution</h3>
+                    <div id="statusChart" style="height: 300px; display: flex; align-items: center; justify-content: center; color: var(--gray);">
+                        Chart will be displayed here
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Section (Hidden by default) -->
+        <div id="settingsSection" class="content-section" style="display: none;">
+            <div class="section-header">
+                <h2><i class="fas fa-cog"></i> System Settings</h2>
+            </div>
+            
+            <div style="max-width: 600px;">
+                <div style="margin-bottom: 30px;">
+                    <h3 style="margin-bottom: 15px; font-size: 16px;">General Settings</h3>
+                    <div class="form-group">
+                        <label>System Name</label>
+                        <input type="text" class="form-control" id="systemName" value="KeyAuth System">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Max Apps per Support</label>
+                        <input type="number" class="form-control" id="maxApps" value="3" min="1" max="100">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Default Key Duration (Days)</label>
+                        <input type="number" class="form-control" id="defaultDays" value="30" min="1" max="365">
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 30px;">
+                    <h3 style="margin-bottom: 15px; font-size: 16px;">Security Settings</h3>
+                    <div class="form-group">
+                        <label>Enable Two-Factor Authentication</label>
+                        <div style="margin-top: 10px;">
+                            <label style="display: flex; align-items: center; gap: 10px;">
+                                <input type="checkbox" id="enable2fa">
+                                <span>Require 2FA for admin login</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Auto-ban Failed Attempts</label>
+                        <input type="number" class="form-control" id="banAttempts" value="5" min="1" max="20">
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="saveSettings()">
+                    <i class="fas fa-save"></i> Save Settings
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create App Modal -->
+    <div class="modal" id="createAppModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus"></i> Create New Application</h3>
+                <button class="modal-close" onclick="closeModal('createAppModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Application Name</label>
+                    <input type="text" class="form-control" id="appName" placeholder="Enter application name">
+                </div>
+                
+                <div class="form-group">
+                    <label>Owner User ID</label>
+                    <input type="text" class="form-control" id="appOwner" placeholder="Enter owner's user ID">
+                </div>
+                
+                <div class="form-group">
+                    <label>Description (Optional)</label>
+                    <textarea class="form-control" id="appDesc" rows="3" placeholder="Enter description"></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="btn btn-outline" onclick="closeModal('createAppModal')">Cancel</button>
+                    <button class="btn btn-primary" onclick="createNewApp()" id="createAppBtn">
+                        <span id="createAppText">Create Application</span>
+                        <span class="loader" id="createAppLoader" style="display: none;"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Key Modal -->
+    <div class="modal" id="createKeyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-key"></i> Create New Key</h3>
+                <button class="modal-close" onclick="closeModal('createKeyModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Select Application</label>
+                    <select class="form-control" id="keyApp">
+                        <option value="">-- Select Application --</option>
+                    </select>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Prefix</label>
+                        <input type="text" class="form-control" id="keyPrefix" placeholder="e.g., SUN">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Duration (Days)</label>
+                        <input type="number" class="form-control" id="keyDays" value="30" min="1" max="365">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Device Limit</label>
+                        <input type="number" class="form-control" id="keyDevices" value="1" min="1" max="100">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="number" class="form-control" id="keyQuantity" value="1" min="1" max="100">
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="btn btn-outline" onclick="closeModal('createKeyModal')">Cancel</button>
+                    <button class="btn btn-primary" onclick="createNewKey()" id="createKeyBtn">
+                        <span id="createKeyText">Create Key</span>
+                        <span class="loader" id="createKeyLoader" style="display: none;"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Support Modal -->
+    <div class="modal" id="addSupportModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-plus"></i> Add Support User</h3>
+                <button class="modal-close" onclick="closeModal('addSupportModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>User ID</label>
+                    <input type="text" class="form-control" id="supportUserId" placeholder="Enter user's Discord ID">
+                </div>
+                
+                <div class="form-group">
+                    <label>Permissions</label>
+                    <div style="margin-top: 10px;">
+                        <label style="display: block; margin-bottom: 10px;">
+                            <input type="checkbox" id="permApps" checked>
+                            <span>Can manage applications</span>
+                        </label>
+                        
+                        <label style="display: block; margin-bottom: 10px;">
+                            <input type="checkbox" id="permKeys" checked>
+                            <span>Can manage keys</span>
+                        </label>
+                        
+                        <label style="display: block;">
+                            <input type="checkbox" id="permView">
+                            <span>Can view analytics</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="btn btn-outline" onclick="closeModal('addSupportModal')">Cancel</button>
+                    <button class="btn btn-primary" onclick="addNewSupport()" id="addSupportBtn">
+                        <span id="addSupportText">Add Support</span>
+                        <span class="loader" id="addSupportLoader" style="display: none;"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Key Modal -->
+    <div class="modal" id="viewKeyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-eye"></i> Key Details</h3>
+                <button class="modal-close" onclick="closeModal('viewKeyModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="keyDetailsContent">
+                    <!-- Key details will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script>
+        const API_PRIMARY = 'https://severkeyvip-kdqp.vercel.app/'
+        const API_BACKUP  = 'https://phatdevauthvip.netlify.app/.netlify/functions/auth';
+        let currentUserId = '';
+        let currentUserRole = '';
+        let isAdminUser = false;
+        let isSupportUser = false;
+        let currentApplications = [];
+        let currentKeys = [];
+
+        function showToast(message, type = 'success') {
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: 'top',
+                position: 'right',
+                backgroundColor: type === 'success' ? '#4cc9f0' : 
+                                type === 'error' ? '#f72585' : 
+                                type === 'warning' ? '#f8961e' : '#4361ee',
+                stopOnFocus: true
+            }).showToast();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            currentUserId = localStorage.getItem('auth_user_id');
+            currentUserRole = localStorage.getItem('auth_role');
+            isAdminUser = localStorage.getItem('auth_isAdmin') === 'true';
+            isSupportUser = localStorage.getItem('auth_isSupport') === 'true';
+            
+            
+            if (!currentUserId || !currentUserRole) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const timestamp = localStorage.getItem('auth_timestamp');
+            const hoursDiff = (Date.now() - timestamp) / (1000 * 60 * 60);
+            if (hoursDiff > 24) {
+                localStorage.clear();
+                window.location.href = 'index.html';
+                return;
+            }
+
+document.getElementById('userName').textContent = `User: ${currentUserId}`;
+
+
+
+            setupEventListeners();
+            
+            loadDashboardData();
+            
+            loadApplicationsForFilter();
+            
+            loadApplications();
+            
+        });
+
+        function setupEventListeners() {
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+
+    document.querySelectorAll('.menu-item').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const section = this.getAttribute('data-section');
+            
+            document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+            this.classList.add('active');
+            
+            showSection(section);
+
+            if (window.innerWidth <= 992) {
+                sidebar.classList.remove('active');
+            }
+        });
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+        localStorage.clear(); // Xóa sạch cho nhanh
+        window.location.href = 'index.html';
+    });
+
+    menuToggle.addEventListener('click', function(e) {
+        e.stopPropagation(); // Ngăn sự kiện lan ra ngoài gây đóng menu ngay lập tức
+        sidebar.classList.toggle('active');
+    });
+
+    document.addEventListener('click', function(e) {
+        const isClickInsideSidebar = sidebar.contains(e.target);
+        const isClickOnToggle = menuToggle.contains(e.target);
+
+        if (!isClickInsideSidebar && !isClickOnToggle && sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+        }
+    });
+}
+
+        function showSection(section) {
+    
+    if (section === 'dashboard') {
+        document.querySelectorAll('.content-section').forEach(el => {
+            if (!el.closest('#dashboardSection') && el.id !== 'dashboardSection') {
+                el.style.display = 'none';
+            }
+        });
+        
+        document.getElementById('dashboardSection').style.display = 'block';
+        
+        document.querySelectorAll('#dashboardSection .content-section').forEach(el => {
+            el.style.display = 'block';
+        });
+    } else {
+        document.querySelectorAll('.content-section').forEach(el => {
+            el.style.display = 'none';
+        });
+        
+        document.getElementById(`${section}Section`).style.display = 'block';
+    }
+    
+    const titles = {
+        'dashboard': 'Dashboard',
+        'applications': 'Applications',
+        'keys': 'Keys Management',
+        'users': 'Users Management',
+        'support': 'Support Management',
+        'analytics': 'Analytics',
+        'settings': 'Settings'
+    };
+    
+    document.getElementById('pageTitle').textContent = titles[section];
+    
+    
+    if (section === 'dashboard') {
+        loadDashboardData();
+        loadApplicationsForFilter();
+    } else if (section === 'applications') {
+        loadApplications();
+    } else if (section === 'keys') {
+        loadKeys();
+    } else if (section === 'users') {
+        loadUsers();
+    } else if (section === 'support') {
+        loadSupports();
+    }
+    
+}
+        async function callAPI(action, data = {}) {
+
+    const payload = {
+        action,
+        user_id: currentUserId,
+        ...data
+    };
+
+    // ===== hàm gọi chung =====
+    async function request(url) {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+            const text = await res.text();
+            throw new Error(`HTTP ${res.status}: ${text.substring(0, 100)}`);
+        }
+
+        return await res.json();
+    }
+
+    try {
+        // ===== THỬ API CHÍNH =====
+        console.log('Call primary API');
+        return await request(API_PRIMARY);
+
+    } catch (err) {
+        console.warn(' Primary fail → fallback', err.message);
+    }
+
+    try {
+        // ===== FALLBACK API =====
+        console.log(' Call backup API');
+        return await request(API_BACKUP);
+
+    } catch (err) {
+        console.error(' Backup cũng fail', err.message);
+        showToast('Lỗi kết nối đến server', 'error');
+        throw err;
+    }
+}
+async function checkCurrentSession() {
+    const userId = localStorage.getItem('auth_user_id');
+    
+    if (!userId) {
+        window.location.href = 'index.html';
+        return;
+    }
+
+    try {
+        const response = await callAPI('check_support', { user_id: userId });
+        
+        if (!response.success || !response.is_support) {
+            alert('Quyền truy cập của bạn đã bị thu hồi!');
+            localStorage.clear(); // Xóa sạch dấu vết
+            window.location.href = 'index.html'; // Đá ra trang login
+        }
+    } catch (error) {
+    }
+}
+
+checkCurrentSession();
+
+        async function loadDashboardData() {
+            
+            try {
+                const appsResult = await callAPI('get_apps', { user_id: currentUserId });
+                if (appsResult.success) {
+                    const apps = appsResult.applications || [];
+                    document.getElementById('totalApps').textContent = apps.length;
+                    currentApplications = apps;
+                    
+                    
+                    const recentApps = apps.slice(0, 5);
+                    const appsBody = document.getElementById('recentAppsBody');
+                    appsBody.innerHTML = '';
+                    
+                    if (recentApps.length === 0) {
+                        appsBody.innerHTML = `
+                            <tr>
+                                <td colspan="7" class="empty-state">
+                                    <i class="fas fa-box"></i>
+                                    <p>No applications found</p>
+                                </td>
+                            </tr>
+                        `;
+                    } else {
+                        recentApps.forEach(app => {
+                            appsBody.innerHTML += `
+                                <tr>
+                                    <td><strong>${app.name}</strong></td>
+                                    <td><code style="background: #f1f3f9; padding: 4px 8px; border-radius: 4px;">${app.api_key}</code></td>
+                                    <td><span class="status-badge status-active">${app.created_by}</span></td>
+                                    <td>${new Date(app.created_at).toLocaleDateString()}</td>
+                                    <td>${app.key_count || 0}</td>
+                                    <td><span class="status-badge status-active">Active</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="action-btn view" onclick="viewApp('${app.api_key}')" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            ${isAdminUser || app.created_by === currentUserId ? `
+                                            <button class="action-btn delete" onclick="deleteApp('${app.name}')" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            ` : ''}
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                    }
+                } else {
+                }
+
+                const keysResult = await callAPI('get_keys', { 
+                    user_id: currentUserId,
+                    api: currentApplications[0]?.api_key || ''
+                });
+                
+                if (keysResult.success) {
+                    const keys = keysResult.keys || [];
+                    document.getElementById('totalKeys').textContent = keys.length;
+                    currentKeys = keys;
+                    
+                    
+                    const recentKeys = keys.slice(0, 11);
+                    const keysBody = document.getElementById('recentKeysBody');
+                    keysBody.innerHTML = '';
+                    
+                    if (recentKeys.length === 0) {
+                        keysBody.innerHTML = `
+                            <tr>
+                                <td colspan="6" class="empty-state">
+                                    <i class="fas fa-key"></i>
+                                    <p>No keys found</p>
+                                </td>
+                            </tr>
+                        `;
+                    } else {
+                        recentKeys.forEach(key => {
+                            const status = getKeyStatus(key);
+                            const statusText = getStatusBadge(status);
+                            
+                            keysBody.innerHTML += `
+                                <tr>
+                                    <td><code style="background: #f1f3f9; padding: 4px 8px; border-radius: 4px;">${key.key}</code></td>
+                                    <td>${key.api}</td>
+                                    <td>${new Date(key.expires_at).toLocaleDateString()}</td>
+                                    <td>${statusText}</td>
+                                    <td>${key.hwid ? 'Yes' : 'No'}</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="action-btn view" onclick="viewKey('${key.key}', '${key.api}')" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            ${isAdminUser ? `
+                                            <button class="action-btn delete" onclick="deleteKey('${key.key}', '${key.api}')" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            ` : ''}
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                    }
+                } else {
+                }
+
+                document.getElementById('totalUsers').textContent = '25';
+                document.getElementById('activeKeys').textContent = currentKeys.filter(k => !k.banned && new Date(k.expires_at) > new Date()).length;
+
+
+            } catch (error) {
+                showToast('Lỗi khi tải dữ liệu dashboard', 'error');
+            }
+        }
+
+        function getKeyStatus(key) {
+            if (key.banned) return 'banned';
+            if (new Date(key.expires_at) < new Date()) return 'expired';
+            if (key.used) return 'active';
+            return 'inactive';
+        }
+
+        function getStatusBadge(status) {
+            const badges = {
+                'banned': '<span class="status-badge status-banned">Banned</span>',
+                'expired': '<span class="status-badge status-expired">Expired</span>',
+                'active': '<span class="status-badge status-active">Active</span>',
+                'inactive': '<span class="status-badge status-inactive">Inactive</span>'
+            };
+            return badges[status] || '<span class="status-badge status-inactive">Unknown</span>';
+        }
+
+        async function loadApplications() {
+            
+            try {
+                const result = await callAPI('get_apps', { user_id: currentUserId });
+                
+                if (result.success) {
+                    const apps = result.applications || [];
+                    const tbody = document.getElementById('appsTableBody');
+                    tbody.innerHTML = '';
+                    
+                    if (apps.length === 0) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="7" class="empty-state">
+                                    <i class="fas fa-box"></i>
+                                    <p>No applications found</p>
+                                    <button class="btn btn-primary" onclick="showCreateAppModal()" style="margin-top: 10px;">
+                                        <i class="fas fa-plus"></i> Create Your First Application
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    } else {
+                        apps.forEach((app, index) => {
+                            tbody.innerHTML += `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td><strong>${app.name}</strong></td>
+                                    <td><code style="background: #f1f3f9; padding: 4px 8px; border-radius: 4px;">${app.api_key}</code></td>
+                                    <td><span class="status-badge status-active">${app.created_by}</span></td>
+                                    <td>${new Date(app.created_at).toLocaleDateString()}</td>
+                                    <td>${app.key_count || 0}</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="action-btn view" onclick="viewApp('${app.api_key}')" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            ${isAdminUser || app.created_by === currentUserId ? `
+                                            <button class="action-btn delete" onclick="deleteApp('${app.name}')" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            ` : ''}
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                    }
+                } else {
+                    showToast('Failed to load applications: ' + (result.message || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                showToast('Lỗi khi tải danh sách applications', 'error');
+            }
+        }
+
+        async function loadApplicationsForFilter() {
+            try {
+                const result = await callAPI('get_apps', { user_id: currentUserId });
+                
+                if (result.success) {
+                    const apps = result.applications || [];
+                    const select = document.getElementById('appFilter');
+                    select.innerHTML = '<option value="">All Applications</option>';
+                    
+                    apps.forEach(app => {
+                        const option = document.createElement('option');
+                        option.value = app.api_key;
+                        option.textContent = app.name;
+                        select.appendChild(option);
+                    });
+                    
+                    const keyAppSelect = document.getElementById('keyApp');
+                    keyAppSelect.innerHTML = '<option value="">-- Select Application --</option>';
+                    
+                    apps.forEach(app => {
+                        const option = document.createElement('option');
+                        option.value = app.api_key;
+                        option.textContent = `${app.name} (${app.api_key.substring(0, 10)}...)`;
+                        keyAppSelect.appendChild(option);
+                    });
+                }
+            } catch (error) {
+            }
+        }
+
+        async function loadKeys(retry = 0, maxRetry = 3) {
+    const tbody = document.getElementById('keysTableBody');
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:30px;"><span class="loader"></span><br>Đang tải dữ liệu...</td></tr>`;
+    
+    try {
+        const appFilter = document.getElementById('appFilter').value;
+        let keys = [];
+        
+        if (appFilter) {
+            const result = await callAPI('get_keys', { user_id: currentUserId, api: appFilter });
+            if (result.success) keys = result.keys || [];
+        } else {
+            const appsResult = await callAPI('get_apps', { user_id: currentUserId });
+            if (!appsResult.success) throw new Error('get_apps failed');
+
+            const apps = appsResult.applications || [];
+            const promises = apps.map(app =>
+                callAPI('get_keys', { user_id: currentUserId, api: app.api_key })
+            );
+
+            const results = await Promise.all(promises);
+            results.forEach(result => {
+                if (result.success && result.keys) {
+                    keys = keys.concat(result.keys);
+                }
+            });
+        }
+        
+        // --- ĐOẠN QUAN TRỌNG NHẤT: SẮP XẾP KEY MỚI LÊN ĐẦU ---
+        keys.sort((a, b) => {
+            return new Date(b.created_at) - new Date(a.created_at);
+        });
+        // ---------------------------------------------------
+
+        tbody.innerHTML = '';
+        
+        if (keys.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="8" class="empty-state"><i class="fas fa-key"></i><p>No keys found</p></td></tr>`;
+            return;
+        }
+
+        // Nếu đây là bảng "Recent" ở Dashboard, bạn có thể cắt bớt:
+        // const displayKeys = keys.slice(0, 10); 
+        
+        keys.forEach(key => {
+            const statusText = getStatusBadge(getKeyStatus(key));
+            tbody.innerHTML += `
+                <tr>
+                    <td><code style="background: #f1f3f9; padding: 4px 8px; border-radius: 4px;">${key.key}</code></td>
+                    <td><small>${key.api}</small></td>
+                    <td>${key.prefix || ''}</td>
+                    <td>${new Date(key.created_at).toLocaleDateString()}</td>
+                    <td>${new Date(key.expires_at).toLocaleDateString()}</td>
+                    <td>${statusText}</td>
+                    <td>${key.hwid ? 'Yes' : 'No'}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn view" onclick="viewKey('${key.key}', '${key.api}')"><i class="fas fa-eye"></i></button>
+                            ${isAdminUser ? `<button class="action-btn delete" onclick="deleteKey('${key.key}', '${key.api}')"><i class="fas fa-trash"></i></button>` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+
+    } catch (error) {
+        console.warn('Load keys failed:', error);
+        if (retry < maxRetry) {
+            setTimeout(() => loadKeys(retry + 1, maxRetry), 1000);
+            return;
+        }
+        showToast('Lỗi kết nối server', 'error');
+    }
+}
+async function loadSupports(retry = 0, maxRetry = 3) {
+    if (!isAdminUser) {
+        showToast('Chỉ admin mới có thể xem danh sách support', 'error');
+        return;
+    }
+
+    const tbody = document.getElementById('supportsTableBody');
+    // Hiển thị loader phong cách loadKeys
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:30px;"><span class="loader"></span><br>Đang tải dữ liệu...</td></tr>`;
+    
+    console.log(`🔄 Loading supports... (Lần thử: ${retry})`);
+
+    try {
+        const result = await callAPI('get_supports', { admin_id: currentUserId });
+        
+        if (result.success) {
+            let supports = result.supports || [];
+
+            // --- SẮP XẾP: AI ĐƯỢC THÊM GẦN ĐÂY LÊN ĐẦU ---
+            supports.sort((a, b) => {
+                return new Date(b.added_at) - new Date(a.added_at);
+            });
+
+            tbody.innerHTML = ''; // Xóa loader
+            
+            if (supports.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            <i class="fas fa-users"></i>
+                            <p>No support users found</p>
+                            <button class="btn btn-primary" onclick="showAddSupportModal()" style="margin-top: 10px;">
+                                <i class="fas fa-user-plus"></i> Add Support User
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // Đổ dữ liệu vào bảng
+            supports.forEach(sup => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${sup.user_id}</strong></td>
+                        <td><span class="status-badge status-inactive">${sup.added_by || 'System'}</span></td>
+                        <td>${new Date(sup.added_at).toLocaleDateString()}</td>
+                        <td>2</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn delete" 
+                                        onclick="removeSupport('${sup.user_id}')" 
+                                        title="Remove Support" 
+                                        ${sup.user_id === currentUserId ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
+                                    <i class="fas fa-user-minus"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        } else {
+            throw new Error(result.message || 'API trả về success: false');
+        }
+
+    } catch (error) {
+        console.warn('❌ Load supports failed:', error);
+        
+        // CƠ CHẾ RETRY Y HỆT LOADKEYS
+        if (retry < maxRetry) {
+            setTimeout(() => loadSupports(retry + 1, maxRetry), 1000);
+            return;
+        }
+        
+        // Nếu đã thử hết số lần mà vẫn lỗi
+        showToast('Lỗi kết nối server khi tải Support', 'error');
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" style="text-align:center; padding:20px;">
+                    <i class="fas fa-exclamation-triangle" style="color:var(--danger);"></i> 
+                    Không thể tải dữ liệu sau ${maxRetry} lần thử.
+                </td>
+            </tr>`;
+    }
+}
+
+
+
+
+        async function loadUsers() {
+            
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="empty-state">
+                        <i class="fas fa-users"></i>
+                        <p>User management coming soon</p>
+                        <p style="font-size: 12px; margin-top: 10px;">Advanced user tracking and management features will be available in the next update.</p>
+                    </td>
+                </tr>
+            `;
+        }
+
+        function showCreateAppModal() {
+            document.getElementById('createAppModal').style.display = 'flex';
+            document.getElementById('appName').focus();
+        }
+
+        function showCreateKeyModal() {
+            document.getElementById('createKeyModal').style.display = 'flex';
+        }
+
+        function showAddSupportModal() {
+            if (!isAdminUser) {
+                showToast('Chỉ admin mới có thể thêm support', 'error');
+                return;
+            }
+            document.getElementById('addSupportModal').style.display = 'flex';
+            document.getElementById('supportUserId').focus();
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        async function createNewApp() {
+            const appName = document.getElementById('appName').value.trim();
+            const appOwner = document.getElementById('appOwner').value.trim();
+            
+            if (!appName || !appOwner) {
+                showToast('Vui lòng điền đầy đủ thông tin', 'warning');
+                return;
+            }
+            
+            const btn = document.getElementById('createAppBtn');
+            const text = document.getElementById('createAppText');
+            const loader = document.getElementById('createAppLoader');
+            
+            btn.disabled = true;
+            text.textContent = 'Đang tạo...';
+            loader.style.display = 'inline-block';
+            
+            try {
+                const result = await callAPI('create_app', {
+                    app_name: appName,
+                    user_id: appOwner
+                });
+                
+                if (result.success) {
+                    showToast('Đã tạo application thành công!', 'success');
+                    closeModal('createAppModal');
+                    
+                    document.getElementById('appName').value = '';
+                    document.getElementById('appOwner').value = '';
+                    document.getElementById('appDesc').value = '';
+                    
+                    loadDashboardData();
+                    loadApplications();
+                    loadApplicationsForFilter();
+                } else {
+                    showToast(result.message || 'Lỗi khi tạo application', 'error');
+                }
+            } catch (error) {
+                showToast('Lỗi kết nối đến server', 'error');
+            } finally {
+                btn.disabled = false;
+                text.textContent = 'Create Application';
+                loader.style.display = 'none';
+            }
+        }
+
+        async function createNewKey() {
+            const apiKey = document.getElementById('keyApp').value;
+            const prefix = document.getElementById('keyPrefix').value.trim();
+            const days = parseInt(document.getElementById('keyDays').value);
+            const devices = parseInt(document.getElementById('keyDevices').value);
+            const quantity = parseInt(document.getElementById('keyQuantity').value);
+            
+            if (!apiKey || !prefix || !days) {
+                showToast('Vui lòng điền đầy đủ thông tin', 'warning');
+                return;
+            }
+            
+            const btn = document.getElementById('createKeyBtn');
+            const text = document.getElementById('createKeyText');
+            const loader = document.getElementById('createKeyLoader');
+            
+            btn.disabled = true;
+            text.textContent = 'Đang tạo...';
+            loader.style.display = 'inline-block';
+            
+            try {
+                let createdKeys = [];
+                let errors = [];
+                
+                for (let i = 0; i < quantity; i++) {
+                    try {
+                        const result = await callAPI('create_key', { 
+                            api: apiKey, 
+                            prefix: prefix, 
+                            days: days,
+                            device_limit: devices,
+                            user_id: currentUserId
+                        });
+                        
+                        if (result.success) {
+                            createdKeys.push(result.key);
+                        } else {
+                            errors.push(`Key ${i + 1}: ${result.message}`);
+                        }
+                    } catch (error) {
+                        errors.push(`Key ${i + 1}: Lỗi mạng`);
+                    }
+                }
+                
+                if (createdKeys.length > 0) {
+                    showToast(`Đã tạo ${createdKeys.length}/${quantity} keys thành công!`, 'success');
+                    closeModal('createKeyModal');
+                    
+                    document.getElementById('keyPrefix').value = '';
+                    document.getElementById('keyDays').value = '30';
+                    document.getElementById('keyDevices').value = '1';
+                    document.getElementById('keyQuantity').value = '1';
+                    
+                    loadDashboardData();
+                    loadKeys();
+                    
+                    if (createdKeys.length > 0) {
+                        let keysText = createdKeys.join('\n');
+                        if (confirm(`Đã tạo ${createdKeys.length} keys thành công!\n\nBạn có muốn sao chép không?`)) {
+    secureCopy(keysText)
+        .then(() => showToast('Đã sao chép vào bộ nhớ tạm!', 'success'))
+        .catch(() => {
+            alert("Không thể tự động copy. Vui lòng copy thủ công:\n\n" + keysText);
+        });
+}
+
+                    }
+                } else {
+                    showToast('Không thể tạo key nào', 'error');
+                }
+                
+            } catch (error) {
+const errorDetail = error.response?.data?.message || error.message || 'Không rõ nguyên nhân';
+showToast(`Lỗi: ${errorDetail}`, 'error');
+
+            } finally {
+                btn.disabled = false;
+                text.textContent = 'Create Key';
+                loader.style.display = 'none';
+            }
+        }
+        function secureCopy(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text);
+    } else {
+        return new Promise((resolve, reject) => {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            textArea.style.top = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                const successful = document.execCommand('copy');
+                document.body.removeChild(textArea);
+                successful ? resolve() : reject();
+            } catch (err) {
+                document.body.removeChild(textArea);
+                reject(err);
+            }
+        });
+    }
+}
+
+        async function addNewSupport() {
+            if (!isAdminUser) {
+                showToast('Chỉ admin mới có thể thêm support', 'error');
+                return;
+            }
+            
+            const userId = document.getElementById('supportUserId').value.trim();
+            
+            if (!userId) {
+                showToast('Vui lòng nhập User ID', 'warning');
+                return;
+            }
+            
+            const btn = document.getElementById('addSupportBtn');
+            const text = document.getElementById('addSupportText');
+            const loader = document.getElementById('addSupportLoader');
+            
+            btn.disabled = true;
+            text.textContent = 'Đang thêm...';
+            loader.style.display = 'inline-block';
+            
+            try {
+                const result = await callAPI('add_support', {
+                    user_id: userId,
+                    admin_id: currentUserId
+                });
+                
+                if (result.success) {
+                    showToast('Đã thêm support thành công!', 'success');
+                    closeModal('addSupportModal');
+                    
+                    document.getElementById('supportUserId').value = '';
+                    
+                    loadSupports();
+                } else {
+                    showToast(result.message || 'Lỗi khi thêm support', 'error');
+                }
+            } catch (error) {
+                showToast('Lỗi kết nối đến server', 'error');
+            } finally {
+                btn.disabled = false;
+                text.textContent = 'Add Support';
+                loader.style.display = 'none';
+            }
+        }
+
+        async function viewKey(key, api) {
+            try {
+                const result = await callAPI('check_key', {
+                    api: api,
+                    key: key,
+                    user_id: currentUserId
+                });
+                
+                if (result.success) {
+                    const keyData = result.key;
+                    const modalContent = document.getElementById('keyDetailsContent');
+                    
+                    const status = getKeyStatus(keyData);
+                    
+                    modalContent.innerHTML = `
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="margin-bottom: 10px; color: var(--dark);">Key Information</h4>
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid var(--gray-light); font-weight: 600;">Key:</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid var(--gray-light);">
+                                        <code style="background: #f1f3f9; padding: 4px 8px; border-radius: 4px; display: inline-block;">${keyData.key}</code>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid var(--gray-light); font-weight: 600;">Application:</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid var(--gray-light);">${keyData.api}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid var(--gray-light); font-weight: 600;">Status:</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid var(--gray-light);">
+                                        ${getStatusBadge(status)}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid var(--gray-light); font-weight: 600;">Created:</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid var(--gray-light);">${new Date(keyData.created_at).toLocaleString()}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid var(--gray-light); font-weight: 600;">Expires:</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid var(--gray-light);">${new Date(keyData.expires_at).toLocaleString()}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid var(--gray-light); font-weight: 600;">Device Limit:</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid var(--gray-light);">${keyData.device_limit}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid var(--gray-light); font-weight: 600;">HWID:</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid var(--gray-light);">
+                                        ${keyData.hwid ? `<code>${keyData.hwid}</code>` : 'Not set'}
+                                    </td>
+                                </tr>
+                                ${keyData.system_info ? `
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid var(--gray-light); font-weight: 600;">System Info:</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid var(--gray-light);">
+                                        <pre style="background: #f1f3f9; padding: 10px; border-radius: 4px; font-size: 12px; max-height: 150px; overflow: auto;">${keyData.system_info}</pre>
+                                    </td>
+                                </tr>
+                                ` : ''}
+                            </table>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <button class="btn btn-outline" onclick="closeModal('viewKeyModal')">Close</button>
+                            ${isAdminUser ? `
+                            <button class="btn btn-danger" onclick="banKey('${key}', '${api}')">
+                                <i class="fas fa-ban"></i> Ban Key
+                            </button>
+                            <button class="btn btn-success" onclick="resetHWID('${key}', '${api}')">
+                                <i class="fas fa-redo"></i> Reset HWID
+                            </button>
+                            ` : ''}
+                        </div>
+                    `;
+                    
+                    document.getElementById('viewKeyModal').style.display = 'flex';
+                } else {
+                    showToast('Không tìm thấy key', 'error');
+                }
+            } catch (error) {
+                showToast('Lỗi khi tải thông tin key', 'error');
+            }
+        }
+
+        async function deleteApp(appName) {
+            if (!confirm(`Bạn có chắc muốn xóa application "${appName}"?`)) return;
+            
+            try {
+                const result = await callAPI('delete_app', {
+                    app_name: appName,
+                    user_id: currentUserId
+                });
+                
+                if (result.success) {
+                    showToast('Đã xóa application thành công!', 'success');
+                    loadDashboardData();
+                    loadApplications();
+                    loadApplicationsForFilter();
+                } else {
+                    showToast(result.message || 'Lỗi khi xóa application', 'error');
+                }
+            } catch (error) {
+                showToast('Lỗi kết nối đến server', 'error');
+            }
+        }
+
+        async function deleteKey(key, api) {
+            if (!confirm(`Bạn có chắc muốn xóa key này?`)) return;
+            
+            try {
+                const result = await callAPI('delete_key', {
+                    api: api,
+                    key: key,
+                    user_id: currentUserId
+                });
+                
+                if (result.success) {
+                    showToast('Đã xóa key thành công!', 'success');
+                    loadDashboardData();
+                    loadKeys();
+                } else {
+                    showToast(result.message || 'Lỗi khi xóa key', 'error');
+                }
+            } catch (error) {
+                showToast('Lỗi kết nối đến server', 'error');
+            }
+        }
+
+        async function banKey(key, api) {
+            if (!confirm(`Bạn có chắc muốn ban key này?`)) return;
+            
+            try {
+                const result = await callAPI('ban_key', {
+                    api: api,
+                    key: key,
+                    user_id: currentUserId
+                });
+                
+                if (result.success) {
+                    showToast('Đã ban key thành công!', 'success');
+                    closeModal('viewKeyModal');
+                    loadDashboardData();
+                    loadKeys();
+                } else {
+                    showToast(result.message || 'Lỗi khi ban key', 'error');
+                }
+            } catch (error) {
+                showToast('Lỗi kết nối đến server', 'error');
+            }
+        }
+
+        async function resetHWID(key, api) {
+            if (!confirm(`Bạn có chắc muốn reset HWID cho key này?`)) return;
+            
+            try {
+                const result = await callAPI('reset_hwid', {
+                    api: api,
+                    key: key,
+                    user_id: currentUserId
+                });
+                
+                if (result.success) {
+                    showToast('Đã reset HWID thành công!', 'success');
+                    if (document.getElementById('viewKeyModal').style.display === 'flex') {
+                        closeModal('viewKeyModal');
+                    }
+                    loadDashboardData();
+                    loadKeys();
+                } else {
+                    showToast(result.message || 'Lỗi khi reset HWID', 'error');
+                }
+            } catch (error) {
+                showToast('Lỗi kết nối đến server', 'error');
+            }
+        }
+
+        async function removeSupport(userId) {
+            if (userId === currentUserId) {
+                showToast('Bạn không thể tự xóa chính mình', 'error');
+                return;
+            }
+            
+            if (!confirm(`Bạn có chắc muốn xóa user ${userId} khỏi danh sách support?`)) return;
+            
+            try {
+                const result = await callAPI('delete_support', {
+                    user_id: userId,
+                    admin_id: currentUserId
+                });
+                
+                if (result.success) {
+                    showToast('Đã xóa support thành công!', 'success');
+                    loadSupports();
+                } else {
+                    showToast(result.message || 'Lỗi khi xóa support', 'error');
+                }
+            } catch (error) {
+                showToast('Lỗi kết nối đến server', 'error');
+            }
+        }
+function filterKeysTable() {
+    const filter = document.getElementById("keySearchInput").value.toUpperCase();
+    const tbody = document.getElementById("keysTableBody");
+    const tr = tbody.getElementsByTagName("tr");
+
+    for (let i = 0; i < tr.length; i++) {
+        const tdKey = tr[i].getElementsByTagName("td")[0];
+        const tdHWID = tr[i].getElementsByTagName("td")[6];
+
+        if (tdKey || tdHWID) {
+            const textKey = tdKey.textContent || tdKey.innerText;
+            const textHWID = tdHWID.textContent || tdHWID.innerText;
+            
+            if (textKey.toUpperCase().indexOf(filter) > -1 || textHWID.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+}
+        function viewApp(apiKey) {
+            showToast(`Viewing app with API key: ${apiKey.substring(0, 10)}...`, 'info');
+        }
+
+        function refreshApplications() {
+            loadApplications();
+            showToast('Đã làm mới danh sách applications', 'success');
+        }
+
+        function refreshKeys() {
+            loadKeys();
+            showToast('Đã làm mới danh sách keys', 'success');
+        }
+
+        function refreshSupports() {
+            loadSupports();
+            showToast('Đã làm mới danh sách support', 'success');
+        }
+
+        function refreshUsers() {
+            loadUsers();
+            showToast('Đã làm mới danh sách users', 'success');
+        }
+
+        function saveSettings() {
+            showToast('Settings saved successfully!', 'success');
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
